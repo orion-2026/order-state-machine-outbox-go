@@ -1,16 +1,25 @@
-# Order State Machine + Outbox Demo (Go)
+# Order State Machine + Outbox Demo (Go + Gin)
 
 A Go + Gin implementation of the order status flow architecture lesson.
 
 ## What this demo shows
 - Order service as source of truth
 - Explicit state machine for allowed transitions
-- Service layer centralizing business rules
+- Application/service layer centralizing business rules
 - Outbox pattern for domain event recording
-- SQLite for easy local run
-- PostgreSQL via Docker Compose for a more realistic setup
+- Easy local run with SQLite
+- Docker Compose option with PostgreSQL
 
-## Endpoints
+## Order lifecycle
+```text
+PendingPayment -> Paid -> Fulfilling -> Shipped -> Completed
+PendingPayment -> Cancelled
+Paid -> Refunded
+Fulfilling -> Cancelled
+Shipped -> Refunded
+```
+
+## API surface
 - `GET /health`
 - `POST /api/orders`
 - `GET /api/orders`
@@ -19,6 +28,11 @@ A Go + Gin implementation of the order status flow architecture lesson.
 - `POST /api/orders/{id}/transitions`
 - `GET /api/outbox`
 - `POST /api/outbox/publish`
+
+## Environment variables
+- `PORT=8080`
+- `DATABASE_PROVIDER=sqlite | postgres`
+- `DATABASE_CONNECTION_STRING=...`
 
 ## Run locally
 ```bash
@@ -35,13 +49,42 @@ Default local DB:
 docker compose up --build
 ```
 
+Default URLs:
+- API: `http://localhost:8080`
+- PostgreSQL: `localhost:5432`
+
+## Example flow
+### Create order
+```bash
+curl -X POST http://localhost:8080/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customerId":"cust-001","productSku":"sku-demo-001","quantity":2}'
+```
+
+### Check allowed actions
+```bash
+curl http://localhost:8080/api/orders/{orderId}/actions
+```
+
+### Transition state
+```bash
+curl -X POST http://localhost:8080/api/orders/{orderId}/transitions \
+  -H "Content-Type: application/json" \
+  -d '{"action":"pay","reason":"Payment callback received"}'
+```
+
+### Read outbox
+```bash
+curl http://localhost:8080/api/outbox
+```
+
 ## Notes
 - Uses GORM auto-migrate for demo simplicity
-- Keeps payloads as JSON strings in the outbox table
-- Intentionally small and teaching-oriented, not production-complete
+- Stores outbox payloads as JSON strings
+- Keeps the project intentionally small and teaching-oriented
 
 ## Good next upgrades
 - Replace auto-migrate with real migrations
 - Add background publisher worker
 - Add optimistic concurrency checks
-- Add dedup / inbox handling for callbacks
+- Add dedup / inbox handling

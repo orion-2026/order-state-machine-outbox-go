@@ -14,11 +14,11 @@ func Open(cfg config.Config) (*gorm.DB, error) {
 	var db *gorm.DB
 	var err error
 
-	switch cfg.DatabaseDriver {
+	switch cfg.DatabaseProvider {
 	case "postgres":
-		db, err = gorm.Open(postgres.Open(cfg.DatabaseDSN), &gorm.Config{})
+		db, err = gorm.Open(postgres.Open(cfg.DatabaseConnectionString), &gorm.Config{})
 	default:
-		db, err = gorm.Open(sqlite.Open(cfg.DatabaseDSN), &gorm.Config{})
+		db, err = gorm.Open(sqlite.Open(cfg.DatabaseConnectionString), &gorm.Config{})
 	}
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)

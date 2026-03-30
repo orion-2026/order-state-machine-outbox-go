@@ -16,8 +16,8 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: 8080
-      DATABASE_DRIVER: postgres
-      DATABASE_DSN: host=postgres user=postgres password=postgres dbname=orders_demo port=5432 sslmode=disable
+      DATABASE_PROVIDER: postgres
+      DATABASE_CONNECTION_STRING: host=postgres user=postgres password=postgres dbname=orders_demo port=5432 sslmode=disable
     depends_on:
       - postgres
     ports:

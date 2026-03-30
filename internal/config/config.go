@@ -3,19 +3,19 @@ package config
 import "os"
 
 type Config struct {
-	Port           string
-	DatabaseDriver string
-	DatabaseDSN    string
+	Port                     string
+	DatabaseProvider         string
+	DatabaseConnectionString string
 }
 
 func Load() Config {
 	port := getenv("PORT", "8080")
-	driver := getenv("DATABASE_DRIVER", "sqlite")
-	dsn := getenv("DATABASE_DSN", "order-demo.db")
+	provider := getenv("DATABASE_PROVIDER", "sqlite")
+	connectionString := getenv("DATABASE_CONNECTION_STRING", "order-demo.db")
 	return Config{
-		Port:           port,
-		DatabaseDriver: driver,
-		DatabaseDSN:    dsn,
+		Port:                     port,
+		DatabaseProvider:         provider,
+		DatabaseConnectionString: connectionString,
 	}
 }
 
